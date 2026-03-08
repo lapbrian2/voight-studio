@@ -141,7 +141,7 @@
       width: 0;
       height: 1px;
       background: var(--stone);
-      transition: width 0.4s cubic-bezier(0.25, 0, 0.15, 1);
+      transition: width 0.65s cubic-bezier(1, 0, 0, 1);
     }
 
     .nav__links a:hover::after {
@@ -258,9 +258,18 @@
       50% { scaleY: 0.4; opacity: 1; }
     }
 
+    /* ---- LINE-MASK SYSTEM (Studio Dado pattern) ---- */
+    .line-mask {
+      overflow: clip;
+    }
+
+    .line-mask .line {
+      transform: translateY(110%);
+    }
+
     /* ---- PHILOSOPHY ---- */
     .philosophy {
-      padding: 12rem 3rem;
+      padding: 16rem 3rem;
       display: flex;
       justify-content: center;
     }
@@ -277,7 +286,7 @@
       letter-spacing: 0.3em;
       text-transform: uppercase;
       color: var(--stone);
-      margin-bottom: 3rem;
+      margin-bottom: 4rem;
       opacity: 0;
     }
 
@@ -285,35 +294,33 @@
       font-family: var(--serif);
       font-weight: 300;
       font-size: clamp(1.8rem, 4vw, 3rem);
-      line-height: 1.4;
+      line-height: 1.5;
       color: var(--warm-white);
     }
 
-    .philosophy__text .word {
-      display: inline-block;
-      opacity: 0;
-      transform: translateY(20px);
+    .philosophy__text .line-mask {
+      margin-bottom: 0.15em;
     }
 
     .philosophy__line {
       width: 60px;
       height: 1px;
       background: var(--stone);
-      margin: 3rem auto 0;
+      margin: 4rem auto 0;
       opacity: 0;
       transform: scaleX(0);
     }
 
     /* ---- SELECTED WORKS ---- */
     .works {
-      padding: 4rem 3rem 10rem;
+      padding: 4rem 3rem 14rem;
     }
 
     .works__header {
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
-      margin-bottom: 6rem;
+      margin-bottom: 8rem;
       padding: 0 1rem;
     }
 
@@ -335,10 +342,12 @@
       opacity: 0;
     }
 
+    /* Asymmetric editorial grid — Studio Dado inspired */
     .works__grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(24, 1fr);
       gap: 2rem;
+      row-gap: 4rem;
     }
 
     .project {
@@ -349,8 +358,24 @@
       transform: translateY(60px);
     }
 
-    .project:nth-child(even) {
-      margin-top: 6rem;
+    /* Asymmetric placement — large/small alternating */
+    .project:nth-child(1) {
+      grid-column: 1 / 15;
+    }
+
+    .project:nth-child(2) {
+      grid-column: 16 / 25;
+      margin-top: 8rem;
+    }
+
+    .project:nth-child(3) {
+      grid-column: 5 / 16;
+      margin-top: -4rem;
+    }
+
+    .project:nth-child(4) {
+      grid-column: 17 / 25;
+      margin-top: -8rem;
     }
 
     .project__image-wrap {
@@ -359,9 +384,16 @@
       aspect-ratio: 3 / 4;
     }
 
-    .project:nth-child(3) .project__image-wrap,
+    .project:nth-child(1) .project__image-wrap {
+      aspect-ratio: 4 / 5;
+    }
+
+    .project:nth-child(3) .project__image-wrap {
+      aspect-ratio: 16 / 10;
+    }
+
     .project:nth-child(4) .project__image-wrap {
-      aspect-ratio: 4 / 3;
+      aspect-ratio: 3 / 4;
     }
 
     .project__image-wrap img {
@@ -369,14 +401,14 @@
     }
 
     .project:hover .project__image-wrap img {
-      transform: scale(1.05);
+      transform: scale(1.03);
     }
 
     .project__image-wrap::after {
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(180deg, transparent 50%, rgba(10,10,10,0.6) 100%);
+      background: linear-gradient(180deg, transparent 60%, rgba(10,10,10,0.4) 100%);
       pointer-events: none;
     }
 
@@ -406,7 +438,7 @@
 
     /* ---- STATEMENT SECTION ---- */
     .statement {
-      padding: 10rem 3rem;
+      padding: 14rem 3rem;
       position: relative;
       overflow: hidden;
     }
@@ -436,7 +468,10 @@
       font-size: clamp(1.5rem, 3.5vw, 2.5rem);
       line-height: 1.5;
       color: var(--cream);
-      opacity: 0;
+    }
+
+    .statement__quote .line-mask {
+      margin-bottom: 0.1em;
     }
 
     .statement__attr {
@@ -451,7 +486,7 @@
 
     /* ---- STUDIO / ABOUT ---- */
     .studio {
-      padding: 10rem 3rem;
+      padding: 14rem 3rem;
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 6rem;
@@ -644,12 +679,24 @@
       .hero__scroll { display: none; }
       .philosophy { padding: 8rem 1.5rem; }
       .works { padding: 3rem 1.5rem 6rem; }
-      .works__header { padding: 0; }
+      .works__header { padding: 0; margin-bottom: 4rem; }
       .works__grid {
-        grid-template-columns: 1fr;
+        display: flex;
+        flex-direction: column;
         gap: 3rem;
       }
-      .project:nth-child(even) { margin-top: 0; }
+      .project:nth-child(1),
+      .project:nth-child(2),
+      .project:nth-child(3),
+      .project:nth-child(4) {
+        grid-column: auto;
+        margin-top: 0;
+      }
+      .project:nth-child(1) .project__image-wrap,
+      .project:nth-child(3) .project__image-wrap,
+      .project:nth-child(4) .project__image-wrap {
+        aspect-ratio: 3 / 4;
+      }
       .statement { padding: 6rem 1.5rem; }
       .studio {
         grid-template-columns: 1fr;
@@ -966,36 +1013,70 @@
           }
         });
 
-        /* PHILOSOPHY — word-by-word reveal */
+        /* PHILOSOPHY — line-mask reveal (Studio Dado pattern) */
         const philoText = document.querySelector('.philosophy__text');
         const philoLabel = document.querySelector('.philosophy__label');
         const philoLine = document.querySelector('.philosophy__line');
-        const text = philoText.textContent.trim();
-        philoText.innerHTML = text.split(/\s+/).map(word =>
-          `<span class="word">${word}</span>`
-        ).join(' ');
 
-        const words = philoText.querySelectorAll('.word');
+        /* Split text into lines using a temporary measurer */
+        function splitIntoLines(el) {
+          const text = el.textContent.trim();
+          const words = text.split(/\s+/);
+          const fontSize = window.getComputedStyle(el).fontSize;
+          const maxWidth = el.offsetWidth;
+
+          /* Measure by building lines */
+          const measurer = document.createElement('span');
+          measurer.style.cssText = `
+            font: ${window.getComputedStyle(el).font};
+            visibility: hidden;
+            position: absolute;
+            white-space: nowrap;
+          `;
+          document.body.appendChild(measurer);
+
+          const lines = [];
+          let currentLine = [];
+
+          words.forEach(word => {
+            currentLine.push(word);
+            measurer.textContent = currentLine.join(' ');
+            if (measurer.offsetWidth > maxWidth && currentLine.length > 1) {
+              currentLine.pop();
+              lines.push(currentLine.join(' '));
+              currentLine = [word];
+            }
+          });
+          if (currentLine.length) lines.push(currentLine.join(' '));
+
+          document.body.removeChild(measurer);
+
+          el.innerHTML = lines.map(line =>
+            `<span class="line-mask"><span class="line">${line}</span></span>`
+          ).join('');
+        }
+
+        splitIntoLines(philoText);
+        const philoLines = philoText.querySelectorAll('.line');
 
         ScrollTrigger.create({
           trigger: '.philosophy',
           start: 'top 70%',
           onEnter: () => {
             gsap.to(philoLabel, { opacity: 1, duration: 0.6 });
-            gsap.to(words, {
-              opacity: 1,
+            gsap.to(philoLines, {
               y: 0,
-              duration: 0.5,
-              stagger: 0.04,
-              ease: 'power2.out',
-              delay: 0.2
+              duration: 0.9,
+              stagger: 0.12,
+              ease: 'power3.out',
+              delay: 0.3
             });
             gsap.to(philoLine, {
               opacity: 1,
               scaleX: 1,
               duration: 0.8,
               ease: 'power2.out',
-              delay: 1.5
+              delay: 1.8
             });
           }
         });
@@ -1049,7 +1130,11 @@
           });
         });
 
-        /* STATEMENT */
+        /* STATEMENT — line-mask on quote */
+        const quoteEl = document.querySelector('.statement__quote');
+        splitIntoLines(quoteEl);
+        const quoteLines = quoteEl.querySelectorAll('.line');
+
         gsap.to('.statement__bg', {
           yPercent: 20,
           ease: 'none',
@@ -1065,15 +1150,16 @@
           trigger: '.statement',
           start: 'top 60%',
           onEnter: () => {
-            gsap.to('.statement__quote', {
-              opacity: 1,
-              duration: 1.2,
-              ease: 'power2.out'
+            gsap.to(quoteLines, {
+              y: 0,
+              duration: 1,
+              stagger: 0.15,
+              ease: 'power3.out'
             });
             gsap.to('.statement__attr', {
               opacity: 1,
               duration: 0.8,
-              delay: 0.6
+              delay: 1
             });
           }
         });
