@@ -732,6 +732,138 @@
       margin: 0 auto 2.5rem;
     }
 
+    /* ---- FEATURED PROJECT (horizontal scroll) ---- */
+    .featured {
+      position: relative;
+      overflow: hidden;
+      border-top: 1px solid var(--muted-10);
+    }
+
+    .featured__track {
+      display: flex;
+      width: max-content;
+      will-change: transform;
+    }
+
+    .featured__header {
+      min-width: 40vw;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 6rem 4rem 6rem 3rem;
+      flex-shrink: 0;
+    }
+
+    .featured__label {
+      font-family: var(--sans);
+      font-size: 0.65rem;
+      font-weight: 400;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--stone);
+      margin-bottom: 2rem;
+      opacity: 0;
+    }
+
+    .featured__title {
+      font-family: var(--serif);
+      font-weight: 300;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      color: var(--cream);
+      line-height: 1.15;
+      margin-bottom: 1.5rem;
+    }
+
+    .featured__subtitle {
+      font-family: var(--sans);
+      font-weight: 300;
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: var(--muted);
+      max-width: 360px;
+      opacity: 0;
+      transform: translateY(15px);
+    }
+
+    .featured__meta-row {
+      display: flex;
+      gap: 3rem;
+      margin-top: 3rem;
+    }
+
+    .featured__meta-item {
+      font-family: var(--sans);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    .featured__meta-item strong {
+      display: block;
+      font-family: var(--serif);
+      font-size: 1rem;
+      font-weight: 400;
+      color: var(--cream);
+      letter-spacing: 0;
+      text-transform: none;
+      margin-top: 0.4rem;
+    }
+
+    .featured__panel {
+      min-width: 45vw;
+      height: 75vh;
+      overflow: hidden;
+      position: relative;
+      flex-shrink: 0;
+      margin-right: 1rem;
+    }
+
+    .featured__panel:last-child {
+      margin-right: 3rem;
+    }
+
+    .featured__panel img {
+      transition: transform 6s var(--ease-smooth);
+    }
+
+    .featured__panel:hover img {
+      transform: scale(1.03);
+    }
+
+    .featured__panel-caption {
+      position: absolute;
+      bottom: 2rem;
+      left: 2rem;
+      font-family: var(--sans);
+      font-size: 0.6rem;
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(232, 228, 223, 0.7);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .featured__panel:hover .featured__panel-caption {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ---- NAV SCROLL STATE ---- */
+    .nav.is-scrolled {
+      background: rgba(10, 10, 10, 0.85);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+      mix-blend-mode: normal;
+      padding-top: 1.2rem;
+      padding-bottom: 1.2rem;
+      transition: background 0.5s ease, padding 0.4s ease;
+    }
+
     /* ---- APPROACH ---- */
     .approach {
       padding: 12rem 3rem;
@@ -1310,6 +1442,35 @@
     </div>
   </section>
 
+  <!-- FEATURED PROJECT (horizontal scroll) -->
+  <section class="featured">
+    <div class="featured__track">
+      <div class="featured__header">
+        <p class="featured__label">Featured Project</p>
+        <h2 class="featured__title">The Lund Residence</h2>
+        <p class="featured__subtitle">A private home in the forests north of Stockholm. Concrete, oak, and glass &mdash; designed to disappear into its surroundings while framing the lake beyond.</p>
+        <div class="featured__meta-row">
+          <div class="featured__meta-item">Year<strong>2024</strong></div>
+          <div class="featured__meta-item">Location<strong>Stockholm</strong></div>
+          <div class="featured__meta-item">Type<strong>Residential</strong></div>
+          <div class="featured__meta-item">Area<strong>340 m&sup2;</strong></div>
+        </div>
+      </div>
+      <div class="featured__panel" data-cursor="Drag">
+        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1400&q=90&auto=format" alt="Lund Residence exterior">
+        <span class="featured__panel-caption">Exterior &mdash; South Elevation</span>
+      </div>
+      <div class="featured__panel" data-cursor="Drag">
+        <img src="https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=1400&q=90&auto=format" alt="Lund Residence interior">
+        <span class="featured__panel-caption">Living Space &mdash; Double Height</span>
+      </div>
+      <div class="featured__panel" data-cursor="Drag">
+        <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1400&q=90&auto=format" alt="Lund Residence detail">
+        <span class="featured__panel-caption">Material Detail &mdash; Oak &amp; Concrete</span>
+      </div>
+    </div>
+  </section>
+
   <!-- APPROACH -->
   <section class="approach" id="approach">
     <div class="approach__header">
@@ -1857,6 +2018,47 @@
           });
         });
 
+        /* ---- FEATURED PROJECT (horizontal scroll) ---- */
+        const featuredSection = document.querySelector('.featured');
+        if (featuredSection) {
+          const track = featuredSection.querySelector('.featured__track');
+          const getScrollDist = () => track.scrollWidth - window.innerWidth;
+
+          gsap.to(track, {
+            x: () => -getScrollDist(),
+            ease: 'none',
+            scrollTrigger: {
+              trigger: featuredSection,
+              start: 'top top',
+              end: () => `+=${getScrollDist()}`,
+              pin: true,
+              scrub: 1,
+              invalidateOnRefresh: true,
+              anticipatePin: 1
+            }
+          });
+
+          ScrollTrigger.create({
+            trigger: featuredSection,
+            start: 'top 60%',
+            onEnter: () => {
+              gsap.to('.featured__label', { opacity: 1, duration: 0.5, ease: 'power2.out' });
+              const ftLines = splitIntoLines(document.querySelector('.featured__title'));
+              gsap.to(ftLines, { y: 0, duration: 1, stagger: 0.1, delay: 0.2, ease: 'power3.out' });
+              gsap.to('.featured__subtitle', { opacity: 1, y: 0, duration: 0.8, delay: 0.5, ease: 'power2.out' });
+              gsap.to('.featured__meta-item', { opacity: 1, y: 0, duration: 0.6, stagger: 0.1, delay: 0.8, ease: 'power2.out' });
+            }
+          });
+        }
+
+        /* ---- NAV SCROLL STATE ---- */
+        ScrollTrigger.create({
+          trigger: '.hero',
+          start: 'bottom 80%',
+          onEnter: () => document.querySelector('.nav').classList.add('is-scrolled'),
+          onLeaveBack: () => document.querySelector('.nav').classList.remove('is-scrolled')
+        });
+
         /* ---- CONTACT ---- */
         const contactHeading = document.querySelector('.contact__heading');
         const chLines = splitIntoLines(contactHeading);
@@ -1920,6 +2122,62 @@
         const docHeight = document.documentElement.scrollHeight - window.innerHeight;
         const progress = (scrollTop / docHeight) * 100;
         progressBar.style.width = progress + '%';
+      });
+
+      /* ========================
+         TEXT SCRAMBLE on section labels
+         ======================== */
+      function textScramble(el) {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+        const original = el.textContent;
+        const len = original.length;
+        let iteration = 0;
+        const interval = setInterval(() => {
+          el.textContent = original.split('').map((c, i) => {
+            if (i < iteration) return original[i];
+            return chars[Math.floor(Math.random() * chars.length)];
+          }).join('');
+          iteration += 1 / 2;
+          if (iteration >= len) {
+            el.textContent = original;
+            clearInterval(interval);
+          }
+        }, 30);
+      }
+
+      /* Trigger scramble on section labels when they scroll into view */
+      document.querySelectorAll('.philosophy__label, .works__title, .approach__label, .studio__label, .featured__label').forEach(label => {
+        ScrollTrigger.create({
+          trigger: label,
+          start: 'top 85%',
+          once: true,
+          onEnter: () => textScramble(label)
+        });
+      });
+
+      /* ========================
+         MAGNETIC HOVER on CTA buttons
+         ======================== */
+      document.querySelectorAll('.hero__cta, .footer__back, .contact__heading').forEach(el => {
+        el.addEventListener('mousemove', e => {
+          const rect = el.getBoundingClientRect();
+          const x = e.clientX - rect.left - rect.width / 2;
+          const y = e.clientY - rect.top - rect.height / 2;
+          gsap.to(el, {
+            x: x * 0.3,
+            y: y * 0.3,
+            duration: 0.4,
+            ease: 'power2.out'
+          });
+        });
+        el.addEventListener('mouseleave', () => {
+          gsap.to(el, {
+            x: 0,
+            y: 0,
+            duration: 0.7,
+            ease: 'elastic.out(1, 0.5)'
+          });
+        });
       });
 
     })();
