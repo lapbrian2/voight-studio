@@ -1097,12 +1097,30 @@
       margin-bottom: 0.5rem;
     }
 
-    /* ---- FOOTER (warm brown — Studio Dado) ---- */
+    /* ---- FOOTER (warm brown — revealed underneath content) ---- */
     .footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
       background: var(--warm-brown);
       padding: 5rem 3rem 2.5rem;
       color: var(--cream);
+      z-index: 1;
     }
+
+    /* Content sits above the footer */
+    .site-content {
+      position: relative;
+      z-index: 2;
+      background: var(--black);
+      transition: background-color 1.2s ease;
+    }
+
+    /* Section color shift zones */
+    .site-content.zone-warm { background-color: #0d0b09; }
+    .site-content.zone-cool { background-color: #09090d; }
+    .site-content.zone-neutral { background-color: var(--black); }
 
     .footer__inner {
       max-width: 1300px;
@@ -1279,6 +1297,9 @@
       <li><a href="#contact">Contact</a></li>
     </ul>
   </nav>
+
+  <!-- SITE CONTENT (sits above fixed footer) -->
+  <div class="site-content">
 
   <!-- HERO -->
   <section class="hero">
@@ -1548,7 +1569,9 @@
     </div>
   </section>
 
-  <!-- FOOTER (warm brown) -->
+  </div><!-- end .site-content -->
+
+  <!-- FOOTER (warm brown — revealed underneath) -->
   <footer class="footer">
     <div class="footer__inner">
       <div class="footer__brand">
@@ -1701,30 +1724,66 @@
       }
 
       /* ========================
-         PRELOADER + TRANSITION
+         PRELOADER + REAL ASSET LOADING
          ======================== */
       const preloader = document.querySelector('.preloader');
       const overlay = document.querySelector('.transition-overlay');
+      const progressText = document.querySelector('.preloader__progress');
+      const progressLine = document.querySelector('.preloader__line');
 
-      const preloaderTL = gsap.timeline({
-        onComplete: () => {
-          preloader.style.display = 'none';
-          overlay.style.display = 'none';
-          lenis.start();
-          initPage();
-          initCursor();
+      /* Track actual image loading */
+      const allImages = document.querySelectorAll('img');
+      let loaded = 0;
+      const total = allImages.length || 1;
+      const lineMaxWidth = 100; /* px */
+
+      function updateProgress() {
+        loaded++;
+        const pct = Math.round((loaded / total) * 100);
+        if (progressText) progressText.textContent = pct + '%';
+        gsap.to(progressLine, { width: (pct / 100) * lineMaxWidth, duration: 0.3, ease: 'power2.out', overwrite: true });
+        if (loaded >= total) finishPreloader();
+      }
+
+      allImages.forEach(img => {
+        if (img.complete) { updateProgress(); }
+        else {
+          img.addEventListener('load', updateProgress);
+          img.addEventListener('error', updateProgress);
         }
       });
 
-      preloaderTL
-        .to('.preloader__name', { opacity: 1, duration: 0.8, ease: 'power2.out' })
-        .to('.preloader__progress', { opacity: 1, duration: 0.4 }, '-=0.4')
-        .to('.preloader__line', { width: '100px', duration: 1.4, ease: 'power3.inOut' }, '-=0.2')
-        .to('.preloader__name', { opacity: 0, y: -15, duration: 0.5, ease: 'power2.in' }, '+=0.3')
-        .to('.preloader__progress', { opacity: 0, duration: 0.3 }, '-=0.4')
-        .to('.preloader__line', { width: 0, opacity: 0, duration: 0.3, ease: 'power2.in' }, '-=0.3')
-        .to(preloader, { yPercent: -100, duration: 0.9, ease: 'power4.inOut' })
-        .to(overlay, { yPercent: -100, duration: 0.8, ease: 'power4.inOut' }, '-=0.6');
+      /* Fallback if images are already cached or none exist */
+      if (loaded >= total) finishPreloader();
+      /* Safety timeout — never block more than 5s */
+      setTimeout(() => { if (loaded < total) finishPreloader(); }, 5000);
+
+      let preloaderDone = false;
+      function finishPreloader() {
+        if (preloaderDone) return;
+        preloaderDone = true;
+
+        const exitTL = gsap.timeline({
+          delay: 0.3,
+          onComplete: () => {
+            preloader.style.display = 'none';
+            overlay.style.display = 'none';
+            lenis.start();
+            initPage();
+            initCursor();
+          }
+        });
+
+        exitTL
+          .to('.preloader__name', { opacity: 1, duration: 0.6, ease: 'power2.out' })
+          .to('.preloader__progress', { opacity: 1, duration: 0.3 }, '-=0.3')
+          .to({}, { duration: 0.4 }) /* brief hold to show 100% */
+          .to('.preloader__name', { opacity: 0, y: -15, duration: 0.5, ease: 'power2.in' })
+          .to('.preloader__progress', { opacity: 0, duration: 0.3 }, '-=0.4')
+          .to(progressLine, { width: 0, opacity: 0, duration: 0.3, ease: 'power2.in' }, '-=0.3')
+          .to(preloader, { yPercent: -100, duration: 0.9, ease: 'power4.inOut' })
+          .to(overlay, { yPercent: -100, duration: 0.8, ease: 'power4.inOut' }, '-=0.6');
+      }
 
       /* ========================
          PAGE INIT — all animations
@@ -2073,6 +2132,29 @@
           }
         });
 
+        /* ---- SECTION COLOR SHIFTS ---- */
+        const sc = document.querySelector('.site-content');
+        const zones = [
+          { trigger: '.hero', class: 'zone-neutral' },
+          { trigger: '.philosophy', class: 'zone-warm' },
+          { trigger: '.works', class: 'zone-neutral' },
+          { trigger: '.statement', class: 'zone-cool' },
+          { trigger: '.featured', class: 'zone-warm' },
+          { trigger: '.approach', class: 'zone-neutral' },
+          { trigger: '.studio', class: 'zone-warm' },
+          { trigger: '.contact', class: 'zone-cool' }
+        ];
+
+        zones.forEach(z => {
+          ScrollTrigger.create({
+            trigger: z.trigger,
+            start: 'top 50%',
+            end: 'bottom 50%',
+            onEnter: () => { sc.className = 'site-content ' + z.class; },
+            onEnterBack: () => { sc.className = 'site-content ' + z.class; }
+          });
+        });
+
       } // end initPage
 
       /* ========================
@@ -2123,6 +2205,19 @@
         const progress = (scrollTop / docHeight) * 100;
         progressBar.style.width = progress + '%';
       });
+
+      /* ========================
+         FOOTER REVEAL — content margin matches footer height
+         ======================== */
+      const siteContent = document.querySelector('.site-content');
+      const footerEl = document.querySelector('.footer');
+      function setFooterMargin() {
+        if (siteContent && footerEl) {
+          siteContent.style.marginBottom = footerEl.offsetHeight + 'px';
+        }
+      }
+      setFooterMargin();
+      window.addEventListener('resize', setFooterMargin);
 
       /* ========================
          TEXT SCRAMBLE on section labels
