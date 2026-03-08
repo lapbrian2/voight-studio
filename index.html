@@ -11,8 +11,9 @@
   <style>
     /* =========================================
        VOIGHT STUDIO — Architecture & Design
-       Single-file creative site v2
-       Cinematic camera, depth layers, orchestrated text
+       Single-file creative site v3
+       Cinematic camera, custom cursor, clip reveals,
+       marquee, warm footer, hover overlays
        Stack: HTML/CSS/JS, GSAP + ScrollTrigger, Lenis
        ========================================= */
 
@@ -30,6 +31,8 @@
       --warm-white: #e8e4df;
       --cream: #f5f0eb;
       --muted: #6b6560;
+      --warm-brown: #5D5346;
+      --warm-brown-light: #6e6354;
       --muted-10: rgba(196, 181, 160, 0.1);
       --muted-05: rgba(196, 181, 160, 0.05);
       --serif: 'Cormorant Garamond', Georgia, serif;
@@ -53,16 +56,76 @@
       font-family: var(--sans);
       font-weight: 300;
       overflow-x: hidden;
-      cursor: default;
+      cursor: none;
     }
 
-    a { color: inherit; text-decoration: none; }
+    a { color: inherit; text-decoration: none; cursor: none; }
 
     img {
       display: block;
       width: 100%;
       height: 100%;
       object-fit: cover;
+    }
+
+    /* ---- CUSTOM CURSOR ---- */
+    .cursor {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 99999;
+      pointer-events: none;
+      mix-blend-mode: difference;
+    }
+
+    .cursor__dot {
+      width: 6px;
+      height: 6px;
+      background: var(--cream);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .cursor__ring {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 40px;
+      height: 40px;
+      border: 1px solid rgba(232, 228, 223, 0.4);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 99998;
+      transition: width 0.4s var(--ease-smooth), height 0.4s var(--ease-smooth), border-color 0.3s ease;
+    }
+
+    .cursor__ring.is-hover {
+      width: 64px;
+      height: 64px;
+      border-color: var(--stone);
+    }
+
+    .cursor__ring.is-text {
+      width: 4px;
+      height: 4px;
+      border-color: var(--stone);
+      background: var(--stone);
+    }
+
+    .cursor__label {
+      position: fixed;
+      z-index: 99997;
+      pointer-events: none;
+      font-family: var(--sans);
+      font-size: 0.55rem;
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--cream);
+      opacity: 0;
+      transform: translate(-50%, 24px);
+      white-space: nowrap;
     }
 
     /* ---- PRELOADER ---- */
@@ -203,7 +266,7 @@
     .hero__media-overlay {
       position: absolute;
       inset: 0;
-      background: rgba(10, 10, 10, 0.55);
+      background: linear-gradient(180deg, rgba(10,10,10,0.3) 0%, rgba(10,10,10,0.6) 60%, rgba(10,10,10,0.85) 100%);
     }
 
     /* Hero content area */
@@ -268,7 +331,6 @@
       margin-top: 2rem;
       opacity: 0;
       transform: translateY(15px);
-      cursor: pointer;
     }
 
     .hero__cta-arrow {
@@ -352,7 +414,7 @@
 
     /* ---- PHILOSOPHY ---- */
     .philosophy {
-      padding: 18rem 3rem 16rem;
+      padding: 14rem 3rem 12rem;
       display: flex;
       justify-content: center;
       position: relative;
@@ -393,16 +455,63 @@
       margin: 5rem auto 0;
     }
 
+    /* ---- MARQUEE TICKER ---- */
+    .marquee {
+      padding: 3rem 0;
+      overflow: hidden;
+      border-top: 1px solid var(--muted-10);
+      border-bottom: 1px solid var(--muted-10);
+      position: relative;
+    }
+
+    .marquee__track {
+      display: flex;
+      width: max-content;
+      animation: marqueeScroll 35s linear infinite;
+    }
+
+    .marquee__item {
+      display: flex;
+      align-items: center;
+      gap: 3rem;
+      padding: 0 3rem;
+      white-space: nowrap;
+    }
+
+    .marquee__text {
+      font-family: var(--serif);
+      font-weight: 300;
+      font-size: clamp(1.4rem, 3vw, 2.2rem);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      opacity: 0.5;
+    }
+
+    .marquee__dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--stone);
+      opacity: 0.4;
+      flex-shrink: 0;
+    }
+
+    @keyframes marqueeScroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
     /* ---- SELECTED WORKS ---- */
     .works {
-      padding: 2rem 3rem 18rem;
+      padding: 10rem 3rem 14rem;
     }
 
     .works__header {
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
-      margin-bottom: 8rem;
+      margin-bottom: 6rem;
       padding-bottom: 2rem;
       border-bottom: 1px solid var(--muted-10);
     }
@@ -431,21 +540,20 @@
       display: grid;
       grid-template-columns: repeat(24, 1fr);
       gap: 2rem;
-      row-gap: 4rem;
+      row-gap: 3rem;
     }
 
     .project {
       position: relative;
       overflow: hidden;
-      cursor: pointer;
       opacity: 0;
       transform: translateY(80px);
     }
 
     .project:nth-child(1) { grid-column: 1 / 15; }
-    .project:nth-child(2) { grid-column: 16 / 25; margin-top: 10rem; }
+    .project:nth-child(2) { grid-column: 16 / 25; margin-top: 8rem; }
     .project:nth-child(3) { grid-column: 3 / 15; margin-top: -2rem; }
-    .project:nth-child(4) { grid-column: 16 / 25; margin-top: -6rem; }
+    .project:nth-child(4) { grid-column: 16 / 25; margin-top: -4rem; }
 
     .project__image-wrap {
       position: relative;
@@ -456,6 +564,18 @@
     .project:nth-child(1) .project__image-wrap { aspect-ratio: 4 / 5; }
     .project:nth-child(3) .project__image-wrap { aspect-ratio: 16 / 10; }
 
+    /* Clip-path image reveal */
+    .project__image-inner {
+      width: 100%;
+      height: 100%;
+      clip-path: inset(100% 0 0 0);
+      will-change: clip-path;
+    }
+
+    .project__image-inner.is-revealed {
+      clip-path: inset(0 0 0 0);
+    }
+
     .project__image-wrap img {
       transition: transform 1.4s var(--ease-smooth);
       will-change: transform;
@@ -465,17 +585,55 @@
       transform: scale(1.04);
     }
 
-    .project__image-wrap::after {
-      content: '';
+    /* Project hover overlay */
+    .project__overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(180deg, transparent 50%, rgba(10,10,10,0.5) 100%);
+      background: linear-gradient(180deg, transparent 30%, rgba(10,10,10,0.7) 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 2rem;
       pointer-events: none;
       opacity: 0;
       transition: opacity 0.5s ease;
     }
 
-    .project:hover .project__image-wrap::after {
+    .project:hover .project__overlay {
+      opacity: 1;
+    }
+
+    .project__overlay-cat {
+      font-family: var(--sans);
+      font-size: 0.6rem;
+      font-weight: 400;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--stone);
+      margin-bottom: 0.5rem;
+    }
+
+    .project__overlay-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: var(--sans);
+      font-size: 0.7rem;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--cream);
+    }
+
+    .project__overlay-arrow {
+      display: inline-block;
+      transform: translateX(-8px);
+      opacity: 0;
+      transition: transform 0.5s var(--ease-smooth), opacity 0.4s ease;
+    }
+
+    .project:hover .project__overlay-arrow {
+      transform: translateX(0);
       opacity: 1;
     }
 
@@ -506,20 +664,9 @@
       color: var(--muted);
     }
 
-    /* ---- HORIZONTAL DIVIDER SECTION ---- */
-    .divider-section {
-      padding: 0 3rem;
-    }
-
-    .divider-section__line {
-      width: 100%;
-      height: 1px;
-      background: var(--muted-10);
-    }
-
     /* ---- STATEMENT ---- */
     .statement {
-      padding: 16rem 3rem;
+      padding: 14rem 3rem;
       position: relative;
       overflow: hidden;
     }
@@ -573,9 +720,79 @@
       margin: 0 auto 2.5rem;
     }
 
+    /* ---- APPROACH ---- */
+    .approach {
+      padding: 12rem 3rem;
+      border-top: 1px solid var(--muted-10);
+    }
+
+    .approach__header {
+      text-align: center;
+      margin-bottom: 8rem;
+    }
+
+    .approach__label {
+      font-family: var(--sans);
+      font-size: 0.65rem;
+      font-weight: 400;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--stone);
+      margin-bottom: 2rem;
+      opacity: 0;
+    }
+
+    .approach__title {
+      font-family: var(--serif);
+      font-weight: 300;
+      font-size: clamp(2rem, 4vw, 3rem);
+      color: var(--cream);
+    }
+
+    .approach__grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      max-width: 1200px;
+      margin: 0 auto;
+      background: var(--muted-10);
+    }
+
+    .approach__step {
+      background: var(--black);
+      padding: 4rem 3rem;
+      opacity: 0;
+      transform: translateY(40px);
+    }
+
+    .approach__number {
+      font-family: var(--serif);
+      font-size: 3.5rem;
+      font-weight: 300;
+      color: var(--muted-10);
+      line-height: 1;
+      margin-bottom: 2rem;
+    }
+
+    .approach__step-title {
+      font-family: var(--serif);
+      font-weight: 400;
+      font-size: 1.4rem;
+      color: var(--cream);
+      margin-bottom: 1.2rem;
+    }
+
+    .approach__step-text {
+      font-family: var(--sans);
+      font-weight: 300;
+      font-size: 0.85rem;
+      line-height: 1.8;
+      color: var(--muted);
+    }
+
     /* ---- STUDIO ---- */
     .studio {
-      padding: 16rem 3rem;
+      padding: 12rem 3rem;
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8rem;
@@ -643,6 +860,11 @@
     .studio__stats {
       display: flex;
       gap: 3.5rem;
+    }
+
+    .stat {
+      opacity: 0;
+      transform: translateY(20px);
     }
 
     .stat__number {
@@ -731,33 +953,100 @@
       margin-bottom: 0.5rem;
     }
 
-    /* ---- FOOTER ---- */
+    /* ---- FOOTER (warm brown — Studio Dado) ---- */
     .footer {
-      padding: 2rem 3rem;
+      background: var(--warm-brown);
+      padding: 5rem 3rem 2.5rem;
+      color: var(--cream);
+    }
+
+    .footer__inner {
+      max-width: 1300px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 3rem;
+      padding-bottom: 4rem;
+      border-bottom: 1px solid rgba(232, 228, 223, 0.12);
+    }
+
+    .footer__brand {
+      max-width: 280px;
+    }
+
+    .footer__logo {
+      font-family: var(--serif);
+      font-weight: 300;
+      font-size: 1.3rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--cream);
+      margin-bottom: 1.5rem;
+    }
+
+    .footer__tagline {
+      font-family: var(--sans);
+      font-size: 0.8rem;
+      font-weight: 300;
+      line-height: 1.7;
+      color: rgba(232, 228, 223, 0.6);
+    }
+
+    .footer__col-title {
+      font-family: var(--sans);
+      font-size: 0.6rem;
+      font-weight: 400;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: rgba(232, 228, 223, 0.4);
+      margin-bottom: 1.5rem;
+    }
+
+    .footer__col-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .footer__col-links a {
+      font-family: var(--sans);
+      font-size: 0.8rem;
+      font-weight: 300;
+      color: rgba(232, 228, 223, 0.7);
+      transition: color 0.3s ease;
+    }
+
+    .footer__col-links a:hover {
+      color: var(--cream);
+    }
+
+    .footer__bottom {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding-top: 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-top: 1px solid var(--muted-05);
     }
 
     .footer__copy {
       font-family: var(--sans);
       font-size: 0.65rem;
-      color: var(--muted);
+      color: rgba(232, 228, 223, 0.4);
       letter-spacing: 0.1em;
     }
 
     .footer__back {
       font-family: var(--sans);
       font-size: 0.65rem;
-      color: var(--muted);
+      color: rgba(232, 228, 223, 0.5);
       letter-spacing: 0.15em;
       text-transform: uppercase;
-      cursor: pointer;
-      transition: color var(--dur) ease;
+      transition: color 0.3s ease;
     }
 
-    .footer__back:hover { color: var(--stone); }
+    .footer__back:hover { color: var(--cream); }
 
     /* ---- GRAIN OVERLAY ---- */
     .grain {
@@ -773,15 +1062,17 @@
 
     /* ---- RESPONSIVE ---- */
     @media (max-width: 900px) {
+      body, a { cursor: auto; }
+      .cursor, .cursor__ring, .cursor__label { display: none; }
       .nav { padding: 1.5rem; }
       .nav__links { gap: 1.5rem; }
       .hero__content { padding: 0 1.5rem 3rem; }
       .hero__title-wrap { padding: 0 1.5rem; padding-bottom: 2rem; }
       .hero__row { flex-direction: column; align-items: flex-start; }
       .hero__scroll { display: none; }
-      .philosophy { padding: 10rem 1.5rem 8rem; }
-      .works { padding: 2rem 1.5rem 8rem; }
-      .works__header { margin-bottom: 4rem; }
+      .philosophy { padding: 8rem 1.5rem 6rem; }
+      .works { padding: 2rem 1.5rem 6rem; }
+      .works__header { margin-bottom: 3rem; }
       .works__grid { display: flex; flex-direction: column; gap: 3rem; }
       .project:nth-child(1),
       .project:nth-child(2),
@@ -789,13 +1080,16 @@
       .project:nth-child(4) { grid-column: auto; margin-top: 0; }
       .project:nth-child(1) .project__image-wrap,
       .project:nth-child(3) .project__image-wrap { aspect-ratio: 3 / 4; }
-      .divider-section { padding: 0 1.5rem; }
       .statement { padding: 8rem 1.5rem; }
-      .studio { grid-template-columns: 1fr; padding: 8rem 1.5rem; gap: 4rem; }
+      .approach { padding: 6rem 1.5rem; }
+      .approach__grid { grid-template-columns: 1fr; }
+      .approach__header { margin-bottom: 4rem; }
+      .studio { grid-template-columns: 1fr; padding: 6rem 1.5rem; gap: 4rem; }
       .studio__content { padding-top: 0; }
       .contact { padding: 6rem 1.5rem; }
       .contact__inner { grid-template-columns: 1fr; gap: 3rem; }
-      .footer { padding: 1.5rem; }
+      .footer { padding: 4rem 1.5rem 2rem; }
+      .footer__inner { grid-template-columns: 1fr 1fr; }
     }
 
     @media (max-width: 600px) {
@@ -803,12 +1097,20 @@
       .hero__title { font-size: clamp(2.5rem, 12vw, 4.5rem); }
       .studio__stats { gap: 2rem; }
       .stat__number { font-size: 2.2rem; }
+      .footer__inner { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
   <div class="grain" aria-hidden="true"></div>
+
+  <!-- CUSTOM CURSOR -->
+  <div class="cursor">
+    <div class="cursor__dot"></div>
+  </div>
+  <div class="cursor__ring"></div>
+  <div class="cursor__label"></div>
 
   <!-- PRELOADER -->
   <div class="preloader">
@@ -825,6 +1127,7 @@
     <a href="#" class="nav__logo">Voight</a>
     <ul class="nav__links">
       <li><a href="#works">Projects</a></li>
+      <li><a href="#approach">Approach</a></li>
       <li><a href="#studio">Studio</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
@@ -845,7 +1148,7 @@
           <p class="hero__description">
             We design spaces that hold people before they understand why. Every project begins with listening.
           </p>
-          <a href="#works" class="hero__cta">
+          <a href="#works" class="hero__cta" data-cursor="Explore">
             View projects <span class="hero__cta-arrow">&rarr;</span>
           </a>
         </div>
@@ -873,9 +1176,38 @@
     </div>
   </section>
 
-  <!-- DIVIDER -->
-  <div class="divider-section">
-    <div class="divider-section__line"></div>
+  <!-- MARQUEE TICKER -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__track">
+      <div class="marquee__item">
+        <span class="marquee__text">Architecture</span>
+        <span class="marquee__dot"></span>
+        <span class="marquee__text">Light</span>
+        <span class="marquee__dot"></span>
+        <span class="marquee__text">Material</span>
+        <span class="marquee__dot"></span>
+        <span class="marquee__text">Silence</span>
+        <span class="marquee__dot"></span>
+        <span class="marquee__text">Space</span>
+        <span class="marquee__dot"></span>
+        <span class="marquee__text">Restraint</span>
+        <span class="marquee__dot"></span>
+      </div>
+      <div class="marquee__item">
+        <span class="marquee__text">Architecture</span>
+        <span class="marquee__dot"></span>
+        <span class="marquee__text">Light</span>
+        <span class="marquee__dot"></span>
+        <span class="marquee__text">Material</span>
+        <span class="marquee__dot"></span>
+        <span class="marquee__text">Silence</span>
+        <span class="marquee__dot"></span>
+        <span class="marquee__text">Space</span>
+        <span class="marquee__dot"></span>
+        <span class="marquee__text">Restraint</span>
+        <span class="marquee__dot"></span>
+      </div>
+    </div>
   </div>
 
   <!-- SELECTED WORKS -->
@@ -886,9 +1218,15 @@
     </div>
     <div class="works__grid">
 
-      <article class="project">
+      <article class="project" data-cursor="View">
         <div class="project__image-wrap">
-          <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=90&auto=format" alt="The Lund Residence" loading="lazy">
+          <div class="project__image-inner">
+            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=90&auto=format" alt="The Lund Residence" loading="lazy">
+          </div>
+          <div class="project__overlay">
+            <span class="project__overlay-cat">Residential</span>
+            <span class="project__overlay-cta">Explore project <span class="project__overlay-arrow">&rarr;</span></span>
+          </div>
         </div>
         <div class="project__info">
           <h3 class="project__name">The Lund Residence</h3>
@@ -896,9 +1234,15 @@
         </div>
       </article>
 
-      <article class="project">
+      <article class="project" data-cursor="View">
         <div class="project__image-wrap">
-          <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&q=90&auto=format" alt="Ora Pavilion" loading="lazy">
+          <div class="project__image-inner">
+            <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&q=90&auto=format" alt="Ora Pavilion" loading="lazy">
+          </div>
+          <div class="project__overlay">
+            <span class="project__overlay-cat">Cultural</span>
+            <span class="project__overlay-cta">Explore project <span class="project__overlay-arrow">&rarr;</span></span>
+          </div>
         </div>
         <div class="project__info">
           <h3 class="project__name">Ora Pavilion</h3>
@@ -906,9 +1250,15 @@
         </div>
       </article>
 
-      <article class="project">
+      <article class="project" data-cursor="View">
         <div class="project__image-wrap">
-          <img src="https://images.unsplash.com/photo-1600566753190-17f0baa2d6c0?w=1200&q=90&auto=format" alt="Elm & Stone" loading="lazy">
+          <div class="project__image-inner">
+            <img src="https://images.unsplash.com/photo-1600566753190-17f0baa2d6c0?w=1200&q=90&auto=format" alt="Elm & Stone" loading="lazy">
+          </div>
+          <div class="project__overlay">
+            <span class="project__overlay-cat">Mixed Use</span>
+            <span class="project__overlay-cta">Explore project <span class="project__overlay-arrow">&rarr;</span></span>
+          </div>
         </div>
         <div class="project__info">
           <h3 class="project__name">Elm &amp; Stone</h3>
@@ -916,9 +1266,15 @@
         </div>
       </article>
 
-      <article class="project">
+      <article class="project" data-cursor="View">
         <div class="project__image-wrap">
-          <img src="https://images.unsplash.com/photo-1600607687644-aac4c3eac7f4?w=1200&q=90&auto=format" alt="The Aldric Hotel" loading="lazy">
+          <div class="project__image-inner">
+            <img src="https://images.unsplash.com/photo-1600607687644-aac4c3eac7f4?w=1200&q=90&auto=format" alt="The Aldric Hotel" loading="lazy">
+          </div>
+          <div class="project__overlay">
+            <span class="project__overlay-cat">Hospitality</span>
+            <span class="project__overlay-cta">Explore project <span class="project__overlay-arrow">&rarr;</span></span>
+          </div>
         </div>
         <div class="project__info">
           <h3 class="project__name">The Aldric Hotel</h3>
@@ -939,10 +1295,35 @@
     </div>
   </section>
 
+  <!-- APPROACH -->
+  <section class="approach" id="approach">
+    <div class="approach__header">
+      <p class="approach__label">Our Approach</p>
+      <h2 class="approach__title">Three acts of making</h2>
+    </div>
+    <div class="approach__grid">
+      <div class="approach__step">
+        <div class="approach__number">01</div>
+        <h3 class="approach__step-title">Listen</h3>
+        <p class="approach__step-text">Before we draw a single line, we spend time with the site, the light, and the people. Every project begins with understanding what the space already wants to be.</p>
+      </div>
+      <div class="approach__step">
+        <div class="approach__number">02</div>
+        <h3 class="approach__step-title">Distill</h3>
+        <p class="approach__step-text">We strip away until only what matters remains. Restraint is not absence &mdash; it is the decision to let materials, proportions, and silence do the work.</p>
+      </div>
+      <div class="approach__step">
+        <div class="approach__number">03</div>
+        <h3 class="approach__step-title">Build</h3>
+        <p class="approach__step-text">Construction is not the end of design. We stay through every pour, every joint, every detail &mdash; because the last five percent is where architecture becomes real.</p>
+      </div>
+    </div>
+  </section>
+
   <!-- STUDIO -->
   <section class="studio" id="studio">
     <div class="studio__image-wrap">
-      <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=1200&q=90&auto=format" alt="Voight Studio workspace" loading="lazy">
+      <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=90&auto=format" alt="Voight Studio workspace" loading="lazy">
     </div>
     <div class="studio__content">
       <p class="studio__label">The Studio</p>
@@ -991,9 +1372,44 @@
     </div>
   </section>
 
+  <!-- FOOTER (warm brown) -->
   <footer class="footer">
-    <span class="footer__copy">&copy; 2025 Voight Studio</span>
-    <span class="footer__back" id="backToTop">Back to top &uarr;</span>
+    <div class="footer__inner">
+      <div class="footer__brand">
+        <div class="footer__logo">Voight Studio</div>
+        <p class="footer__tagline">Architecture rooted in light, material, and silence. Stockholm-based design practice since 2019.</p>
+      </div>
+      <div class="footer__col">
+        <p class="footer__col-title">Navigate</p>
+        <ul class="footer__col-links">
+          <li><a href="#works">Projects</a></li>
+          <li><a href="#approach">Approach</a></li>
+          <li><a href="#studio">Studio</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <p class="footer__col-title">Connect</p>
+        <ul class="footer__col-links">
+          <li><a href="#">Instagram</a></li>
+          <li><a href="#">LinkedIn</a></li>
+          <li><a href="#">Pinterest</a></li>
+          <li><a href="#">Behance</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <p class="footer__col-title">Legal</p>
+        <ul class="footer__col-links">
+          <li><a href="#">Privacy</a></li>
+          <li><a href="#">Terms</a></li>
+          <li><a href="#">Cookies</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span class="footer__copy">&copy; 2025 Voight Studio. All rights reserved.</span>
+      <span class="footer__back" id="backToTop">Back to top &uarr;</span>
+    </div>
   </footer>
 
   <!-- SCRIPTS -->
@@ -1018,6 +1434,57 @@
       gsap.ticker.add((time) => lenis.raf(time * 1000));
       gsap.ticker.lagSmoothing(0);
       lenis.stop();
+
+      /* ========================
+         CUSTOM CURSOR
+         ======================== */
+      const cursorDot = document.querySelector('.cursor');
+      const cursorRing = document.querySelector('.cursor__ring');
+      const cursorLabel = document.querySelector('.cursor__label');
+      let mouseX = window.innerWidth / 2;
+      let mouseY = window.innerHeight / 2;
+      let ringX = mouseX;
+      let ringY = mouseY;
+
+      document.addEventListener('mousemove', e => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        gsap.set(cursorDot, { x: mouseX, y: mouseY });
+      });
+
+      /* Smooth ring follow */
+      gsap.ticker.add(() => {
+        ringX += (mouseX - ringX) * 0.15;
+        ringY += (mouseY - ringY) * 0.15;
+        gsap.set(cursorRing, { x: ringX, y: ringY });
+        gsap.set(cursorLabel, { x: ringX, y: ringY });
+      });
+
+      /* Hover detection for interactive elements */
+      function initCursor() {
+        const interactives = document.querySelectorAll('a, button, .project, .hero__cta, .footer__back, [data-cursor]');
+        interactives.forEach(el => {
+          el.addEventListener('mouseenter', () => {
+            cursorRing.classList.add('is-hover');
+            const label = el.getAttribute('data-cursor');
+            if (label) {
+              cursorLabel.textContent = label;
+              gsap.to(cursorLabel, { opacity: 1, duration: 0.3 });
+            }
+          });
+          el.addEventListener('mouseleave', () => {
+            cursorRing.classList.remove('is-hover');
+            gsap.to(cursorLabel, { opacity: 0, duration: 0.2 });
+          });
+        });
+
+        /* Text hover — thin cursor for paragraphs */
+        const textEls = document.querySelectorAll('p, .philosophy__text, .statement__quote, .studio__text, .approach__step-text');
+        textEls.forEach(el => {
+          el.addEventListener('mouseenter', () => cursorRing.classList.add('is-text'));
+          el.addEventListener('mouseleave', () => cursorRing.classList.remove('is-text'));
+        });
+      }
 
       /* ========================
          UTILITIES
@@ -1069,6 +1536,7 @@
           overlay.style.display = 'none';
           lenis.start();
           initPage();
+          initCursor();
         }
       });
 
@@ -1191,6 +1659,18 @@
           }
         });
 
+        /* Philosophy parallax shift */
+        gsap.to('.philosophy__inner', {
+          yPercent: -8,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: '.philosophy',
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: true
+          }
+        });
+
         /* ---- WORKS ---- */
         const worksTitle = document.querySelector('.works__title');
         const wtLines = splitIntoLines(worksTitle);
@@ -1204,13 +1684,24 @@
           }
         });
 
-        /* Projects — reveal + parallax */
-        document.querySelectorAll('.project').forEach(project => {
+        /* Projects — reveal + parallax + clip-path */
+        document.querySelectorAll('.project').forEach((project, i) => {
+          const imgInner = project.querySelector('.project__image-inner');
+
           ScrollTrigger.create({
             trigger: project,
             start: 'top 88%',
             onEnter: () => {
-              gsap.to(project, { opacity: 1, y: 0, duration: 1.2, ease: 'power3.out' });
+              /* Stagger projects slightly */
+              gsap.to(project, { opacity: 1, y: 0, duration: 1.2, ease: 'power3.out', delay: i * 0.05 });
+
+              /* Clip-path image reveal */
+              gsap.to(imgInner, {
+                clipPath: 'inset(0% 0 0 0)',
+                duration: 1.4,
+                ease: 'power4.inOut',
+                delay: 0.2 + (i * 0.05)
+              });
             }
           });
 
@@ -1264,6 +1755,35 @@
           }
         });
 
+        /* ---- APPROACH ---- */
+        const approachTitle = document.querySelector('.approach__title');
+        const atLines = splitIntoLines(approachTitle);
+
+        ScrollTrigger.create({
+          trigger: '.approach__header',
+          start: 'top 75%',
+          onEnter: () => {
+            gsap.to('.approach__label', { opacity: 1, duration: 0.5, ease: 'power2.out' });
+            gsap.to(atLines, { y: 0, duration: 0.9, stagger: 0.1, delay: 0.2, ease: 'power3.out' });
+          }
+        });
+
+        document.querySelectorAll('.approach__step').forEach((step, i) => {
+          ScrollTrigger.create({
+            trigger: step,
+            start: 'top 80%',
+            onEnter: () => {
+              gsap.to(step, {
+                opacity: 1,
+                y: 0,
+                duration: 1,
+                ease: 'power3.out',
+                delay: i * 0.15
+              });
+            }
+          });
+        });
+
         /* ---- STUDIO ---- */
         const studioHeading = document.querySelector('.studio__heading');
         const shLines = splitIntoLines(studioHeading);
@@ -1276,6 +1796,17 @@
             gsap.to('.studio__content', { opacity: 1, y: 0, duration: 1.2, delay: 0.15, ease: 'power3.out' });
             gsap.to(shLines, { y: 0, duration: 1, stagger: 0.12, delay: 0.3, ease: 'power3.out' });
             gsap.to('.studio__divider', { width: '100%', duration: 1.4, delay: 0.8, ease: 'power3.inOut' });
+
+            /* Staggered stat reveals */
+            document.querySelectorAll('.stat').forEach((stat, i) => {
+              gsap.to(stat, {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                ease: 'power3.out',
+                delay: 1.2 + (i * 0.15)
+              });
+            });
           }
         });
 
